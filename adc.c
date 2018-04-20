@@ -24,7 +24,7 @@
 
 unsigned ADC_get_value(enum ADC_MUX mux)
 {
-	ADMUX = (1 << REFS0)| mux;
+	ADMUX = (1 << REFS0) | (1 << REFS1) | mux;
 	ADCSRA = (1 << ADEN) | (1 << ADSC);
 
 	while (!(ADCSRA & (1 << ADIF)));
@@ -34,5 +34,5 @@ unsigned ADC_get_value(enum ADC_MUX mux)
 
 double ADC_get_voltage(enum ADC_MUX mux, double ref)
 {
-	return ADC_get_value(mux) * ref / 10.24;
+	return ADC_get_value(mux) * 0.002502444;
 }
