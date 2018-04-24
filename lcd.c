@@ -26,6 +26,18 @@
 #define cbi(sfr, bit)	(_SFR_BYTE(sfr) &= ~_BV(bit))				//!< Skasuj bit w rejestrze
 #define put_data(data)	(PORTB = (PORTB & 0xF0) | (data & 0x0F))	//!< Wystaw dane D4..D7
 
+static void _enable_a(void)
+{
+	cbi(PORTA, 7);
+	sbi(PORTA, 7);
+
+	_delay_us(5);
+
+	cbi(PORTA, 7);
+
+	_delay_us(55);
+}
+
 static void _enable_l(void)
 {
 	cbi(PORTA, 7);
@@ -56,7 +68,7 @@ static void _put_data(char data)
 	_enable_s();
 
 	put_data(data & 0x0F);
-	_enable_l();
+	_enable_a();
 }
 
 /* * * * * * * * * * * * * * * * LCD  PUBLIC * * * * * * * * * * * * * * * */
@@ -100,6 +112,8 @@ void LCD_clean(void)
 	cbi(PORTA, 6); // akcja = zapis
 
 	_put_data(0x01);
+
+	_delay_us(2200);
 }
 
 void LCD_line1(void)
@@ -125,8 +139,8 @@ void LCD_write(const char* data)
 
 int LCD_putch(char c, FILE* f)
 {
-	sbi(PORTA,5); // dane = znaki
-	cbi(PORTA,6); // akcja = zapis
+	sbi(PORTA, 5); // dane = znaki
+	cbi(PORTA, 6); // akcja = zapis
 
 	_put_data(c);
 
