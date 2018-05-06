@@ -21,10 +21,13 @@
 #ifndef UART_H_
 #define UART_H_
 
+#include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
 
 #include <util/delay.h>
+
+#include <avr/interrupt.h>
 #include <avr/io.h>
 
 /*! \file				uart.h
@@ -72,5 +75,13 @@ int UART_putch(char c, FILE* f);
  *
  */
 char UART_getch(FILE* f);
+
+/*!	\brief			Sprawdzenie dostępności zbuforowanych danych
+ * 	\return			Prawda, gdy zbuforowano jakiekolwiek dane
+ *
+ *	Sprawdza, czy w buforze zapisano dane. Działa tylko w trybie pracy z przerwaniem.
+ *
+ */
+bool UART_ready(void);
 
 #endif /* UART_H_ */

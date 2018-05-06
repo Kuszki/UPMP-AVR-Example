@@ -20,17 +20,43 @@
 
 #include "uart.h"
 
+/* * * * * * * * * * * * * * * UART  OPTIONS * * * * * * * * * * * * * * * */
+
+#define USE_INT	1		//!< Tryb pracy (1 - używaj przerwania RXC)
+
+/* * * * * * * * * * * * * * * UART  PRIVATE * * * * * * * * * * * * * * * */
+
+#define BUFF_SIZE	64		//!< Rozmiar bufora wejścia/wyjścia
+
+#define step_up(x)	(x + 1) & (BUFF_SIZE - 1);
+
+#if USE_INT == 1
+volatile struct
+{
+	unsigned char head;		//!< Koniec danych
+	unsigned char tail;		//!< Początek danych
+
+	char data[BUFF_SIZE];	//!< Bufor na dane
+}
+buffer;
+#endif
+
 /* * * * * * * * * * * * * * * * UART PUBLIC * * * * * * * * * * * * * * * */
 
 void UART_init(unsigned long baud)
 {
 	baud = F_CPU / (8 * baud) - 1;
 
+#if USE_INT == 1
+	buffer.head = 0;
+	buffer.tail = 0;
+#endif
+
 	UBRRH = baud >> 8;
 	UBRRL = baud & 0xFF;
 
 	UCSRA = (1 << U2X);
-	UCSRB = (1 << RXEN) | (1 << TXEN);
+	UCSRB = (1 << RXEN) | (1 << TXEN) | (USE_INT << RXCIE);
 	UCSRC = (1 << UCSZ0) | (1 << UCSZ1) | (1 << URSEL);
 }
 
@@ -50,7 +76,29 @@ int UART_putch(char c, FILE* f)
 
 char UART_getch(FILE* f)
 {
-	while (!(UCSRA & (1 << RXC)));
+	while (!UART_ready());
 
+#if USE_INT == 1
+	buffer.tail = step_up(buffer.tail);
+	return buffer.data[buffer.tail];
+#else
 	return UDR;
+#endif
 }
+
+bool UART_ready(void)
+{
+#if USE_INT == 1
+	return buffer.head != buffer.tail;
+#else
+	return UCSRA & (1 << RXC);
+#endif
+}
+
+#if USE_INT == 1
+ISR(USART_RXC_vect)
+{
+	buffer.head = step_up(buffer.head);
+	buffer.data[buffer.head] = UDR;
+}
+#endif

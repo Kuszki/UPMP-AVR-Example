@@ -21,6 +21,8 @@
 #ifndef ADC_H_
 #define ADC_H_
 
+#include <util/delay.h>
+
 #include <avr/io.h>
 
 /*! \file				adc.h
@@ -56,12 +58,11 @@ unsigned ADC_get_value(enum ADC_MUX mux);
 
 /*!	\brief			Odczyt napięcia wejściowego przetwornika AC
  * 	\param [in] mux	Numer wejscia
- * 	\param [in] ref	Wartość napięcia referencyjnego
  * 	\return			Wynik konwersji z zakresu <0; ref>
  *
  *	Wykonanie pojedynczej konwersji AC dla wybranego wejścia i zwrócenie jej wyniku.
  *
  */
-double ADC_get_voltage(enum ADC_MUX mux, double ref);
+double ADC_get_voltage(enum ADC_MUX mux);
 
 #endif /* ADC_H_ */
