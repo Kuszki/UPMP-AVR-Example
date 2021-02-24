@@ -66,6 +66,6 @@ int main (void)
 		LCD_printf_1("%02u.%02u.%04u", time.tm_mday, time.tm_mon + 1, time.tm_year + 1900);
 		LCD_printf_2("%02u.%02u.%02u", time.tm_hour, time.tm_min, time.tm_sec);
 
-		_delay_ms(250);
+		delay_ms(250);
 	}
 }
