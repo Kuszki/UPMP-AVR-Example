@@ -135,7 +135,7 @@ int RTC_get_time(struct tm* time)
 			case 2:
 				time->tm_hour = BCD_convert_from(data & ((data & 0x40) ? 0x1F : 0x3F));
 
-				if (data & 0x60) time->tm_hour *= 2;
+				if (data & 0x60) time->tm_hour += 12; // PM
 			break;
 			case 3:
 				time->tm_wday = BCD_convert_from(data & 0x07) - 1;
