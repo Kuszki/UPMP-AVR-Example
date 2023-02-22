@@ -65,7 +65,7 @@ int TWI_begin_read(unsigned char slave, unsigned char addr)
 	while (!(TWCR & (1 << TWINT)));
 	if ((TWSR & 0xF8) != TW_REP_START) return 4;
 
-	TWDR = 0xD0 | TW_READ;
+	TWDR = slave | TW_READ;
 	TWCR = (1 << TWINT) | (1 << TWEN);
 
 	while (!(TWCR & (1 << TWINT)));
